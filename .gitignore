@@ -175,4 +175,6 @@ saved_data/
 .DS_Store
 
 # Claude files
-.claude/
+.claude/test-results.xml
+coverage.lcov
+errors.log

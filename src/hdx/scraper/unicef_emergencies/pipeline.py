@@ -2,8 +2,7 @@
 """UNICEF Level of Emergencies scraper"""
 
 import logging
-from datetime import datetime, timezone
-from typing import Dict, Optional
+from datetime import UTC, datetime
 
 from hdx.api.configuration import Configuration
 from hdx.data.dataset import Dataset
@@ -38,7 +37,7 @@ class Pipeline:
         )
         return max(years)
 
-    def get_emergency_levels(self, year: int) -> Dict[str, Dict]:
+    def get_emergency_levels(self, year: int) -> dict[str, dict]:
         url = self._configuration["base_url"].format(year=year)
         response = self._retriever.download_json(
             url, f"unicef_emergencies_{year}.json", headers=_HEADERS
@@ -70,7 +69,7 @@ class Pipeline:
             }
         return rows
 
-    def generate_dataset(self) -> Optional[Dataset]:
+    def generate_dataset(self) -> Dataset | None:
         year = self.get_latest_year()
         rows = self.get_emergency_levels(year)
         if not rows:
@@ -97,17 +96,20 @@ class Pipeline:
                 logger.error(f"Could not add country location for {iso3}")
 
         resource_name = self._configuration["resource_name"].format(year=year)
-        resource_date = datetime.now(timezone.utc).strftime("%-d %B %Y")
+        resource_date = datetime.now(UTC).strftime("%-d %B %Y")
         resource_description = self._configuration["resource_description"].format(
             date=resource_date
         )
 
-        dataset.generate_resource_from_iterable(
-            headers=list(next(iter(rows.values())).keys()),
-            iterable=list(rows.values()),
-            hxltags=self._configuration["hxl_tags"],
+        headers = list(next(iter(rows.values())).keys())
+        hxl_tags = self._configuration["hxl_tags"]
+        csv_rows = [hxl_tags, *rows.values()]
+
+        dataset.generate_resource(
             folder=self._tempdir,
             filename=resource_name,
+            rows=csv_rows,
+            headers=headers,
             resourcedata={
                 "name": resource_name,
                 "description": resource_description,

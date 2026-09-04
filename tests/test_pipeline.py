@@ -1,10 +1,11 @@
 import csv
 from os.path import join
 
-from hdx.scraper.unicef_emergencies.pipeline import Pipeline
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import temp_dir
 from hdx.utilities.retriever import Retrieve
+
+from hdx.scraper.unicef_emergencies.pipeline import Pipeline
 
 
 class TestPipeline:
@@ -35,7 +36,10 @@ class TestPipeline:
                     == "UNICEF Humanitarian Response: Countries and Emergency Levels"
                 )
                 assert dataset.get_tags() == ["affected area"]
-                assert dataset.get_time_period()["startdate_str"] == "2026-01-01T00:00:00"
+                assert (
+                    dataset.get_time_period()["startdate_str"]
+                    == "2026-01-01T00:00:00+00:00"
+                )
 
                 resources = dataset.get_resources()
                 assert len(resources) == 1
