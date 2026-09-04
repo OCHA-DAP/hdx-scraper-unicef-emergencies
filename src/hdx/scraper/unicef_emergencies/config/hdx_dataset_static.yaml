@@ -1,0 +1,10 @@
+license_id: cc-by
+methodology: Registry
+caveats: 
+dataset_source: UNICEF
+package_creator: HDX Data Systems Team
+private: False
+maintainer: 4c4492ca-9b78-438a-b66a-587e2bb017b1
+owner_org:  3ab17ac1-1196-4501-a4dc-a01d2e52ff7c
+data_update_frequency: As needed
+notes: The Core Commitments for Children (CCCs) in Humanitarian Action 2020 set out a policy and framework to equip UNICEF and its partners to deliver a principled, timely, quality and child-centred humanitarian response and advocacy in any crises with humanitarian consequences. The determination of a Unicef Level 3 or Level 2 emergency is made based on scale; urgency; complexity; and capacity of RO and COs affected by the crisis. Data extracted from https://open.unicef.org/flows-overview
