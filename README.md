@@ -1,9 +1,12 @@
-# Collector for Unicef_emergencies Datasets
-[![Build Status](https://github.com/OCHA-DAP/hdx-scraper-unicef_emergencies/actions/workflows/run-python-tests.yaml/badge.svg)](https://github.com/OCHA-DAP/hdx-scraper-unicef_emergencies/actions/workflows/run-python-tests.yaml)
-[![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-scraper-unicef_emergencies/badge.svg?branch=main&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-scraper-unicef_emergencies?branch=main)
+# Collector for UNICEF Level of Emergencies Dataset
+[![Build Status](https://github.com/OCHA-DAP/hdx-scraper-unicef-emergencies/actions/workflows/run-python-tests.yaml/badge.svg)](https://github.com/OCHA-DAP/hdx-scraper-unicef-emergencies/actions/workflows/run-python-tests.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/OCHA-DAP/hdx-scraper-unicef-emergencies/badge.svg?branch=main&ts=1)](https://coveralls.io/github/OCHA-DAP/hdx-scraper-unicef-emergencies?branch=main)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-This script ...
+This script pulls UNICEF's per-country Emergency Level (L1/L2/L3) classification from
+UNICEF's transparency portal (`open.unicef.org/flows-overview`) and updates the
+[`unicef-level-of-emergencies`](https://data.humdata.org/dataset/unicef-level-of-emergencies)
+dataset on HDX, replacing what was previously a manual upload.
 
 ## Development
 
@@ -29,7 +32,7 @@ For the script to run, you will need to have a file called
  You will also need to supply the universal .useragents.yaml file in your home
  directory as specified in the parameter *user_agent_config_yaml* passed to
  facade in run.py. The collector reads the key
- **hdx-scraper-unicef_emergencies** as specified in the parameter
+ **hdx-scraper-unicef-emergencies** as specified in the parameter
  *user_agent_lookup*.
 
  Alternatively, you can set up environment variables: `USER_AGENT`, `HDX_KEY`,

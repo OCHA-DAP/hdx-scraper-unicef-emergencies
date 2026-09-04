@@ -4,8 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-<!-- Filled in once the pipeline's design is known (by the `pipeline-builder` skill's Stage 6, or by
-hand): what this pipeline does, its data source, and its HDX output shape. -->
+Fetches UNICEF's per-country Emergency Level (L1/L2/L3) classification from
+`open.unicef.org/get-map-humanitarian/{year}` (an internal JSON endpoint behind Cloudflare bot
+management, not a documented public API) and updates the
+[`unicef-level-of-emergencies`](https://data.humdata.org/dataset/unicef-level-of-emergencies)
+dataset on HDX in place, replacing what was previously a manual CSV upload. Single-call API,
+one global dataset, no per-country loop, no pagination, no deep history (source only exposes
+the current + previous year).
 
 ## Commands
 
@@ -16,7 +21,7 @@ uv sync
 ```
 
 Run the pipeline (requires `~/.hdx_configuration.yaml` with an HDX key, and `~/.useragents.yaml`
-with a `hdx-scraper-unicef_emergencies` entry — see README.md):
+with a `hdx-scraper-unicef-emergencies` entry — see README.md):
 
 ```shell
 uv run python -m hdx.scraper.unicef_emergencies
@@ -54,8 +59,15 @@ automatically on commit).
 
 ## Architecture
 
-<!-- Filled in once the pipeline's design is known (by the `pipeline-builder` skill's Stage 6, or by
-hand): module-by-module breakdown of `src/hdx/scraper/unicef_emergencies/`. -->
+- `pipeline.py` — `Pipeline` class: `get_latest_year()` reads the source's year-index endpoint
+  and picks the max; `get_emergency_levels(year)` fetches that year's data and derives the
+  display-level (`emergency=="Others"` + `hacFlag==1` → "Level 1"; `"Level 2"`/`"Level 3"` pass
+  through directly); `generate_dataset()` builds the `Dataset`, adds country locations, and
+  writes the single CSV resource.
+- `__main__.py` — standard `facade()` orchestration entrypoint; wires up `Retrieve`/`Download`
+  and calls `Pipeline.generate_dataset()`.
+- `config/project_configuration.yaml` — source URLs, dataset name/title, HXL tags.
+- `config/hdx_dataset_static.yaml` — dataset identity fields (org, maintainer, license, etc.).
 
 ## Code Style
 

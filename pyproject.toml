@@ -9,7 +9,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "hdx-scraper-unicef_emergencies"
+name = "hdx-scraper-unicef-emergencies"
 dynamic = ["version"]
 requires-python = ">=3.13"
 dependencies = [
@@ -20,9 +20,9 @@ dependencies = [
 readme = "README.md"
 
 [project.urls]
-Homepage = "https://github.com/OCHA-DAP/hdx-scraper-unicef_emergencies"
-Repository = "https://github.com/OCHA-DAP/hdx-scraper-unicef_emergencies"
-Issues = "https://github.com/OCHA-DAP/hdx-scraper-unicef_emergencies/issues"
+Homepage = "https://github.com/OCHA-DAP/hdx-scraper-unicef-emergencies"
+Repository = "https://github.com/OCHA-DAP/hdx-scraper-unicef-emergencies"
+Issues = "https://github.com/OCHA-DAP/hdx-scraper-unicef-emergencies/issues"
 
 [dependency-groups]
 dev = [
