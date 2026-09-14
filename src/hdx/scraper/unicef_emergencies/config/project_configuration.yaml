@@ -13,10 +13,3 @@ resource_description: "List of countries in L1, L2, L3 emergencies as of {date}.
 
 tags:
   - "affected area"
-
-hxl_tags:
-  "Emergency Level": "#severity"
-  "Country": "#country+name"
-  "Country ISO 3": "#country+code"
-  "Lat": "#geo+lat"
-  "Lon": "#geo+lon"

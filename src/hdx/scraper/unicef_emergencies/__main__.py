@@ -11,6 +11,7 @@ from os.path import expanduser, join
 from hdx.api.configuration import Configuration
 from hdx.data.user import User
 from hdx.facades.infer_arguments import facade
+from hdx.utilities.dateparse import now_utc
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import (
     script_dir_plus_file,
@@ -43,11 +44,11 @@ def main(
     """
     logger.info(f"##### {_LOOKUP} version {__version__} ####")
     configuration = Configuration.read()
-    User.check_current_user_write_access("3ab17ac1-1196-4501-a4dc-a01d2e52ff7c")
+    User.check_current_user_write_access("unicef-data")
 
     with wheretostart_tempdir_batch(folder=_LOOKUP) as info:
         tempdir = info["folder"]
-        with Download() as downloader:
+        with Download(user_agent="HDX emergency level/python 3.13") as downloader:
             retriever = Retrieve(
                 downloader=downloader,
                 fallback_dir=tempdir,
@@ -57,10 +58,9 @@ def main(
                 use_saved=use_saved,
             )
             pipeline = Pipeline(configuration, retriever, tempdir)
-            #
-            # Steps to generate dataset
-            #
-            dataset = pipeline.generate_dataset()
+
+            today = now_utc()
+            dataset = pipeline.generate_dataset(today)
             if dataset:
                 dataset.update_from_yaml(
                     script_dir_plus_file(
@@ -78,7 +78,6 @@ def main(
 if __name__ == "__main__":
     facade(
         main,
-        #        hdx_site="dev",
         user_agent_config_yaml=join(expanduser("~"), ".useragents.yaml"),
         user_agent_lookup=_LOOKUP,
         project_config_yaml=script_dir_plus_file(

@@ -2,26 +2,13 @@
 """UNICEF Level of Emergencies scraper"""
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 
 from hdx.api.configuration import Configuration
 from hdx.data.dataset import Dataset
-from hdx.data.hdxobject import HDXError
 from hdx.utilities.retriever import Retrieve
 
 logger = logging.getLogger(__name__)
-
-# open.unicef.org sits behind Cloudflare bot management, which returns a 403
-# challenge page to requests that don't look like a real browser. These
-# headers are the minimum needed to reliably get past it.
-_HEADERS = {
-    "Accept": "application/json, text/plain, */*",
-    "Referer": "https://open.unicef.org/flows-overview",
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
-    ),
-}
 
 
 class Pipeline:
@@ -32,18 +19,14 @@ class Pipeline:
 
     def get_latest_year(self) -> int:
         years_url = self._configuration["years_url"]
-        years = self._retriever.download_json(
-            years_url, "unicef_emergencies_years.json", headers=_HEADERS
-        )
+        years = self._retriever.download_json(years_url)
         return max(years)
 
-    def get_emergency_levels(self, year: int) -> dict[str, dict]:
+    def get_emergency_levels(self, year: int) -> list[dict[str, dict]]:
         url = self._configuration["base_url"].format(year=year)
-        response = self._retriever.download_json(
-            url, f"unicef_emergencies_{year}.json", headers=_HEADERS
-        )
+        response = self._retriever.download_json(url)
 
-        rows = {}
+        rows = []
         for country_data in response["data"].values():
             iso3 = country_data["isoalpha3"]
             emergency = country_data["emergency"]
@@ -60,16 +43,18 @@ class Pipeline:
                 )
                 continue
 
-            rows[iso3] = {
-                "Emergency Level": level,
-                "Country": country_data["country"],
-                "Country ISO 3": iso3,
-                "Lat": country_data["lat"],
-                "Lon": country_data["lon"],
-            }
+            rows.append(
+                {
+                    "Emergency Level": level,
+                    "Country": country_data["country"],
+                    "Country ISO 3": iso3,
+                    "Lat": country_data["lat"],
+                    "Lon": country_data["lon"],
+                }
+            )
         return rows
 
-    def generate_dataset(self) -> Dataset | None:
+    def generate_dataset(self, today: datetime) -> Dataset | None:
         year = self.get_latest_year()
         rows = self.get_emergency_levels(year)
         if not rows:
@@ -78,7 +63,6 @@ class Pipeline:
 
         dataset_name = self._configuration["dataset_name"]
         dataset_title = self._configuration["dataset_title"]
-        dataset_tags = self._configuration["tags"]
 
         dataset = Dataset(
             {
@@ -86,30 +70,21 @@ class Pipeline:
                 "title": dataset_title,
             }
         )
-        dataset.set_time_period_year_range(year)
-        dataset.add_tags(dataset_tags)
-
-        for iso3 in rows:
-            try:
-                dataset.add_country_location(iso3)
-            except HDXError:
-                logger.error(f"Could not add country location for {iso3}")
+        dataset.set_time_period(today, today)
+        dataset.add_tags(self._configuration["tags"])
+        dataset.add_other_location("world")
 
         resource_name = self._configuration["resource_name"].format(year=year)
-        resource_date = datetime.now(UTC).strftime("%-d %B %Y")
+        resource_date = today.strftime("%-d %B %Y")
         resource_description = self._configuration["resource_description"].format(
             date=resource_date
         )
 
-        headers = list(next(iter(rows.values())).keys())
-        hxl_tags = self._configuration["hxl_tags"]
-        csv_rows = [hxl_tags, *rows.values()]
-
         dataset.generate_resource(
             folder=self._tempdir,
             filename=resource_name,
-            rows=csv_rows,
-            headers=headers,
+            rows=rows,
+            headers=list(rows[0].keys()),
             resourcedata={
                 "name": resource_name,
                 "description": resource_description,
