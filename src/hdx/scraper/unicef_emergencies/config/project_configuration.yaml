@@ -1,0 +1,15 @@
+# Collector specific configuration
+
+years_url: "https://open.unicef.org/get-map-humanitarian/"
+base_url: "https://open.unicef.org/get-map-humanitarian/{year}"
+
+dataset_name: "unicef-level-of-emergencies"
+
+dataset_title: "UNICEF Humanitarian Response: Countries and Emergency Levels"
+
+resource_name: "UNICEF_Level_of_Emergencies_{year}.csv"
+
+resource_description: "List of countries in L1, L2, L3 emergencies as of {date}."
+
+tags:
+  - "affected area"
