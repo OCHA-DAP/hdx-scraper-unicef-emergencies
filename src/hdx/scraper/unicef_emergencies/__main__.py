@@ -48,7 +48,9 @@ def main(
 
     with wheretostart_tempdir_batch(folder=_LOOKUP) as info:
         tempdir = info["folder"]
-        with Download(full_agent="HDXINTERNAL: UNICEFEmergencies (HDX emergency level)") as downloader:
+        with Download(
+            full_agent="HDXINTERNAL: UNICEFEmergencies (HDX emergency level)"
+        ) as downloader:
             retriever = Retrieve(
                 downloader=downloader,
                 fallback_dir=tempdir,
